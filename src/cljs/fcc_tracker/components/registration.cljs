@@ -47,6 +47,6 @@
          "Cancel"]]])))
 
 (defn registration-button []
-  [:a.btn
+  [:button.btn
    {:on-click #(session/put! :modal registration-form)}
    "register"])

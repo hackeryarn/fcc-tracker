@@ -79,3 +79,17 @@ body {
 .modal-backdrop {
     z-index: 1;
 }
+
+.bg-green {
+    background: #006400;
+}
+
+.btn {
+    background: #006400;
+    color: #fff;
+}
+
+.btn:hover {
+    opacity: 0.5;
+    color: #ddd;
+}
