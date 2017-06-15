@@ -1,97 +1,96 @@
 (ns fcc-tracker.core
-  (:require [fcc-tracker.ajax :refer [load-interceptors!]]
-            [ajax.core :refer [GET]]
-            [cljsjs.jquery]
+  (:require [ajax.core :refer [GET]]
+            [fcc-tracker.ajax :refer [load-interceptors!]]
+            [fcc-tracker.components.registration :as reg]
             [goog.events :as events]
-            [goog.history.EventType :as HistoryEventType]
-            [hoplon.core
-             :as h
-             :include-macros true]
-            [hoplon.jquery]
-            [javelin.core
-             :refer [cell]
-             :refer-macros [cell= dosync]]
-            [markdown.core :refer [md->html]]
+            [goog.history.EventType :as EventType]
+            [reagent.core :as r]
+            [reagent.session :as session]
             [secretary.core :as secretary])
   (:import goog.History))
 
-(defonce selected-page (cell :home))
+(defn nav-link [uri title page collapsed?]
+  [:li.nav-item
+   {:class (when (= page (session/get :page)) "active")}
+   [:a.nav-link
+    {:href uri
+     :on-click #(reset! collapsed? true)} title]])
 
-(defonce docs (cell nil))
-
-(defn nav-link [uri title page expanded?]
-  (h/li :class (cell= {:active (= page selected-page)
-                       :nav-item true})
-    (h/a :class "nav-link"
-         :href uri
-         :click #(do
-                   (reset! expanded? false)
-                   (secretary/dispatch! uri))
-         title)))
+(defn user-menu []
+  (if-let [id (session/get :identity)]
+    [:ul.nav.navbar-nav.float-xs-right
+     [:li.nav-item
+      [:a.dropdown-item.btn
+       {:on-click #(session/remove! :identity)}
+       [:i.fa.fa-user] " " id " | sign out"]]]
+    [:ul.nav.float-xs-right.navbar-nav
+     [:li.nav-item [reg/registration-button]]]))
 
 (defn navbar []
-  (let [expanded? (cell false)]
-    (h/nav :class "navbar navbar-dark bg-primary"
-      (h/button :class "navbar-toggler hidden-sm-up"
-                :click #(swap! expanded? not)
-                "☰")
-      (h/div :class (cell= {:collapse true
-                            :navbar-toggleable-xs true
-                            :in expanded?})
-       (h/a :class "navbar-brand" :href "/" "fcc_tracker")
-       (h/ul {:class "nav navbar-nav"}
-         (nav-link "#/" "Home" :home expanded?)
-         (nav-link "#/about" "About" :about expanded?))))))
+  (let [collapsed? (r/atom true)]
+    (fn []
+      [:nav.navbar.navbar-light.bg-faded
+       [:button.navbar-toggler.hidden-sm-up
+        {:on-click #(swap! collapsed? not)}]
+       [:div.collapse.navbar-toggleable-xs.float-xs-left
+        (when-not @collapsed? {:class "in"})
+        [:a.navbar-brand {:href "#/"} "FreeCodeCamp Tracker"]
+        [:ul.nav.navbar-nav.float-xs-left
+         [nav-link "#/" "Home" :home collapsed?]
+         [nav-link "#/about" "About" :about collapsed?]]]
+       [user-menu]])))
 
-(defn about []
-  (h/div :class "container"
-    (h/div :class "row"
-      (h/div :class "col-md-12"
-        (h/img :src (str js/context "/img/warning_clojure.png"))))))
+(defn about-page []
+  [:div "this is the story of picture-gallery... work in progress"])
 
-(defn home []
-  (h/div :class "container"
-    (h/div :html (cell= (md->html docs)))))
+(defn home-page []
+  [:div.container
+   [:div.jumbotron
+    [:h1 "Welcome to FreeCodeCamp Tracker"]]
+   [:div.row
+    [:div.col-md-12
+     [:h2 "TODO: display pictures"]]]])
 
-(h/defelem page []
-  (h/div :id "app"
-    (navbar)
-    (cell=
-     (case selected-page
-       :home (home)
-       :about (about)))))
+(def pages
+  {:home  #'home-page
+   :about #'about-page})
 
+(defn modal []
+  (when-let [session-modal (session/get :modal)]
+    [session-modal]))
+
+(defn page []
+  [:div
+   [modal]
+   [(pages (session/get :page))]])
 ;; -------------------------
 ;; Routes
 (secretary/set-config! :prefix "#")
 
 (secretary/defroute "/" []
- (reset! selected-page :home))
+                    (session/put! :page :home))
 
 (secretary/defroute "/about" []
- (reset! selected-page :about))
+                    (session/put! :page :about))
 
 ;; -------------------------
 ;; History
 ;; must be called after routes have been defined
 (defn hook-browser-navigation! []
- (doto (History.)
-   (events/listen
-     HistoryEventType/NAVIGATE
-     (fn [event]
-       (secretary/dispatch! (.-token event))))
-   (.setEnabled true)))
+  (doto (History.)
+    (events/listen
+      EventType/NAVIGATE
+      (fn [event]
+        (secretary/dispatch! (.-token event))))
+    (.setEnabled true)))
 
 ;; -------------------------
 ;; Initialize app
-(defn fetch-docs! []
-  (GET "/docs" {:handler #(reset! docs %)}))
-
 (defn mount-components []
-  (js/jQuery #(.replaceWith (js/jQuery "#app") (page))))
+  (r/render [#'navbar] (.getElementById js/document "navbar"))
+  (r/render [#'page] (.getElementById js/document "app")))
 
 (defn init! []
   (load-interceptors!)
   (hook-browser-navigation!)
-  (mount-components)
-  (fetch-docs!))
+  (mount-components))

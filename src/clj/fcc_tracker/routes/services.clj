@@ -6,7 +6,6 @@
 
 (s/defschema OrgRegistration
   {:id String
-   :org_name String
    :pass String
    :pass-confirm String})
 

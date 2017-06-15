@@ -7,12 +7,10 @@
                  [cider/cider-nrepl "0.15.0-SNAPSHOT"]
                  [clj-time "0.13.0"]
                  [cljs-ajax "0.6.0"]
-                 [cljsjs/jquery "2.2.4-0"]
                  [compojure "1.6.0"]
                  [conman "0.6.4"]
                  [cprop "0.1.10"]
                  [funcool/struct "1.0.0"]
-                 [hoplon "6.0.0-alpha17"]
                  [luminus-immutant "0.2.3"]
                  [luminus-migrations "0.3.5"]
                  [luminus-nrepl "0.1.4"]
@@ -35,7 +33,9 @@
                  [ring/ring-defaults "0.3.0"]
                  [secretary "1.2.3"]
                  [selmer "1.10.7"]
-                 [metosin/compojure-api "1.1.10"]]
+                 [metosin/compojure-api "1.1.10"]
+                 [reagent "0.6.2"]
+                 [reagent-utils "0.2.1"]]
 
   :min-lein-version "2.0.0"
 
