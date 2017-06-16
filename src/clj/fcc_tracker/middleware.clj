@@ -1,19 +1,19 @@
 (ns fcc-tracker.middleware
-  (:require [fcc-tracker.env :refer [defaults]]
-            [clojure.tools.logging :as log]
-            [fcc-tracker.layout :refer [*app-context* error-page]]
-            [ring.middleware.anti-forgery :refer [wrap-anti-forgery]]
-            [ring.middleware.webjars :refer [wrap-webjars]]
-            [muuntaja.middleware :refer [wrap-format wrap-params]]
-            [fcc-tracker.config :refer [env]]
-            [ring.middleware.flash :refer [wrap-flash]]
-            [immutant.web.middleware :refer [wrap-session]]
-            [ring.middleware.defaults :refer [site-defaults wrap-defaults]]
-            [buddy.auth.middleware :refer [wrap-authentication wrap-authorization]]
+  (:require [buddy.auth :refer [authenticated?]]
             [buddy.auth.accessrules :refer [restrict]]
-            [buddy.auth :refer [authenticated?]]
-            [buddy.auth.backends.session :refer [session-backend]])
-  (:import [javax.servlet ServletContext]))
+            [buddy.auth.backends.session :refer [session-backend]]
+            [buddy.auth.middleware :refer [wrap-authentication wrap-authorization]]
+            [clojure.tools.logging :as log]
+            [fcc-tracker.config :refer [env]]
+            [fcc-tracker.env :refer [defaults]]
+            [fcc-tracker.layout :refer [*app-context* *identity* error-page]]
+            [immutant.web.middleware :refer [wrap-session]]
+            [muuntaja.middleware :refer [wrap-format wrap-params]]
+            [ring.middleware.anti-forgery :refer [wrap-anti-forgery]]
+            [ring.middleware.defaults :refer [site-defaults wrap-defaults]]
+            [ring.middleware.flash :refer [wrap-flash]]
+            [ring.middleware.webjars :refer [wrap-webjars]])
+  (:import javax.servlet.ServletContext))
 
 (defn wrap-context [handler]
   (fn [request]
@@ -64,9 +64,15 @@
   (restrict handler {:handler authenticated?
                      :on-error on-error}))
 
+(defn wrap-identity [handler]
+  (fn [request]
+    (binding [*identity* (get-in request [:session :identity])]
+      (handler request))))
+
 (defn wrap-auth [handler]
   (let [backend (session-backend)]
     (-> handler
+        wrap-identity
         (wrap-authentication backend)
         (wrap-authorization backend))))
 

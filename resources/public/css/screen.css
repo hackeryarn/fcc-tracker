@@ -84,12 +84,44 @@ body {
     background: #006400;
 }
 
-.btn {
+.btn-header {
     background: #006400;
+    border: none;
     color: #fff;
 }
 
-.btn:hover {
-    opacity: 0.5;
+.btn-header:hover {
+    color: #ddd;
+    cursor: pointer;
+}
+
+.dropdown-item:hover {
+    background: #007500;
+}
+
+.btn-header:visited {
+    color: #fff;
+}
+
+.btn-primary {
+    background: #006400;
+    border: none;
+}
+
+.btn-primary:hover {
+    background: #007500;
+}
+
+.btn-danger {
+    background: #640000;
+    border: none;
+}
+
+.btn-danger:hover {
+    background: #750000;
+}
+
+.btn-primary:hover, .btn-danger:hover {
     color: #ddd;
 }
+

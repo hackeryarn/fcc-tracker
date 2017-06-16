@@ -1,6 +1,7 @@
 (ns fcc-tracker.core
-  (:require [ajax.core :refer [GET]]
+  (:require [ajax.core :refer [GET POST]]
             [fcc-tracker.ajax :refer [load-interceptors!]]
+            [fcc-tracker.components.login :as l]
             [fcc-tracker.components.registration :as reg]
             [goog.events :as events]
             [goog.history.EventType :as EventType]
@@ -19,12 +20,15 @@
 (defn user-menu []
   (if-let [id (session/get :identity)]
     [:ul.nav.navbar-nav.float-xs-right
-     [:li.nav-item
-      [:a.dropdown-item.btn
-       {:on-click #(session/remove! :identity)}
+     [:li.nav-item.btn-header
+      [:a.dropdown-item
+       {:on-click #(POST
+                    "/logout"
+                    {:handler (fn [] (session/remove! :identity))})}
        [:i.fa.fa-user] " " id " | sign out"]]]
     [:ul.nav.float-xs-right.navbar-nav
-     [:li.nav-item [reg/registration-button]]]))
+     [:li.nav-item.btn-header [l/login-button]]
+     [:li.nav-item.btn-header [reg/registration-button]]]))
 
 (defn navbar []
   (let [collapsed? (r/atom true)]
@@ -93,4 +97,5 @@
 (defn init! []
   (load-interceptors!)
   (hook-browser-navigation!)
+  (session/put! :identity js/identity)
   (mount-components))
