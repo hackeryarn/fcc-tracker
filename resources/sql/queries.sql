@@ -13,3 +13,9 @@ WHERE id = :id
 -- :doc delete a organization given the id
 DELETE FROM organizations
 WHERE id = :id
+
+-- :name create-member! :! :n
+-- create a new member
+INSERT INTO members
+(organization, fcc_username, name)
+VALUES (:organization, :fcc_username, :name)

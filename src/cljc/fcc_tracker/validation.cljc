@@ -19,3 +19,11 @@
             [min-count 7 :message "password must contain at least 8 characters"]
             [st/identical-to :pass-confirm]]})))
 
+(defn member-creation-errros [params]
+  (first
+   (st/validate
+    params
+    {:id [st/required]
+     :fcc_username [st/required]
+     :name [st/required]})))
+
