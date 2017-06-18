@@ -1,6 +1,6 @@
 (ns fcc-tracker.routes.services.members
-  (:require [clojure.tools.logging :as log]
-            [fcc-tracker.db.core :as db]
+  (:require [fcc-tracker.db.core :as db]
+            [fcc-tracker.routes.services.utils :as utils]
             [ring.util.http-response :refer :all]))
 
 (defn create-member! [org {:keys [fcc_username, name]}]
@@ -10,5 +10,6 @@
                         :name name})
     (ok {:result :ok})
     (catch Exception e
-      (log/error e)
-      (internal-server-error "error"))))
+      (utils/handle-duplicate-error
+       e
+       "member with the selected FreeCodeCamp username already exists"))))
