@@ -2,6 +2,7 @@
   (:require [fcc-tracker.routes.services.auth :as auth]
             [fcc-tracker.routes.services.members :as members]
             [ring.util.http-response :refer :all]
+            [ring.util.http-status :as http-status]
             [compojure.api.sweet :refer :all]
             [schema.core :as s]
             [fcc-tracker.middleware :as m]))
@@ -15,9 +16,13 @@
    :pass String
    :pass-confirm String})
 
-(s/defschema MemberCreation
-  {:fcc_username String
+(s/defschema Member
+  {:organization String
+   :fcc_username String
    :name String})
+
+(s/defschema NewMember
+  (dissoc Member :organization))
 
 (defapi service-routes
   {:swagger {:ui "/swagger-ui"
@@ -40,9 +45,11 @@
     :summary "remove user session"
     :return Result
     (auth/logout!))
-  (middleware [[m/wrap-auth]]
-              (POST "/members" req
-                :body [member MemberCreation]
-                :return Result
-                :summary "creates a new member for the current organization"
-                (members/create-member! (:identity req) member))))
+  (context "/members" []
+           :middleware [[m/wrap-auth]]
+           (resource
+            {:post {:parameters {:body-params NewMember}
+                    :responses {http-status/ok {:schema Result}}
+                    :summary "creates a new member for the current organization"
+                    :handler (fn [{member :body-params org :identity}]
+                               (members/create-member! org member))}})))
