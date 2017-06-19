@@ -24,32 +24,39 @@
 (s/defschema NewMember
   (dissoc Member :organization))
 
+(def auth-routes
+  (context "/" []
+    (POST "/register" req
+      :return Result
+      :body [user OrgRegistration]
+      :summary "register a new organization"
+      (auth/register! req user))
+    (POST "/login" req
+      :header-params [authorization :- String]
+      :summary "log in the user and create a session"
+      :return Result
+      (auth/login! req authorization))
+    (POST "/logout" []
+      :summary "remove user session"
+      :return Result
+      (auth/logout!))))
+
+(def members-routes
+  (context "/members" []
+    :middleware [[m/wrap-auth]]
+    (resource
+     {:post {:parameters {:body-params NewMember}
+             :responses {http-status/ok {:schema Result}}
+             :summary "creates a new member for the current organization"
+             :handler (fn [{member :body-params org :identity}]
+                        (members/create-member! org member))}})))
+
 (defapi service-routes
   {:swagger {:ui "/swagger-ui"
              :spec "/swagger.json"
              :data {:info {:version "1.0.0"
                            :title "FreeCodeCamp Tracker API"
-                           :description "Public Services"}}}}
+                           :description "Services"}}}}
+  auth-routes
+  members-routes)
 
-  (POST "/register" req
-    :return Result
-    :body [user OrgRegistration]
-    :summary "register a new organization"
-    (auth/register! req user))
-  (POST "/login" req
-    :header-params [authorization :- String]
-    :summary "log in the user and create a session"
-    :return Result
-    (auth/login! req authorization))
-  (POST "/logout" []
-    :summary "remove user session"
-    :return Result
-    (auth/logout!))
-  (context "/members" []
-           :middleware [[m/wrap-auth]]
-           (resource
-            {:post {:parameters {:body-params NewMember}
-                    :responses {http-status/ok {:schema Result}}
-                    :summary "creates a new member for the current organization"
-                    :handler (fn [{member :body-params org :identity}]
-                               (members/create-member! org member))}})))
