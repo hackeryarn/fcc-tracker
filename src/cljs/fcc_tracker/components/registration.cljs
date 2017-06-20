@@ -23,18 +23,18 @@
         error (r/atom nil)]
     (fn []
       [c/modal
-       [:div "FreeCodeCamp Tracker Registration"]
+       [:div "Register to track members"]
        [:div
         [:div.well.well-sm
          [:strong "* required field"]]
         [c/text-input "name" :id "enter a user name" fields]
-        (when-let [errors (first (:id @error))]
+        (when-let [error (first (:id @error))]
           [:div.alert.alert-danger error])
         [c/password-input "password" :pass "enter a password" fields]
-        (when-let [errors (first (:pass @error))]
+        (when-let [error (first (:pass @error))]
           [:div.alert.alert-danger error])
         [c/password-input "password" :pass-confirm "re-enter the password" fields]
-        (when-let [errors (first (:pass-confirm @error))]
+        (when-let [error (first (:pass-confirm @error))]
           [:div.alert.alert-danger error])
         (when-let [error (:server-error @error)]
           [:div.alert.alert-danger error])]

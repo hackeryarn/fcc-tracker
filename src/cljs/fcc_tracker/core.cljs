@@ -1,8 +1,9 @@
 (ns fcc-tracker.core
-  (:require [ajax.core :refer [GET POST]]
+  (:require [ajax.core :refer [POST]]
             [fcc-tracker.ajax :refer [load-interceptors!]]
             [fcc-tracker.components.login :as l]
             [fcc-tracker.components.registration :as reg]
+            [fcc-tracker.components.new-member :as nm]
             [goog.events :as events]
             [goog.history.EventType :as EventType]
             [reagent.core :as r]
@@ -38,7 +39,7 @@
         {:on-click #(swap! collapsed? not)}]
        [:div.collapse.navbar-toggleable-xs.float-xs-left
         (when-not @collapsed? {:class "in"})
-        [:a.navbar-brand {:href "#/"} "FreeCodeCamp Tracker"]
+        [:a.navbar-brand {:href "#/"} "freeCodeCamp Tracker"]
         [:ul.nav.navbar-nav.float-xs-left
          [nav-link "#/" "Home" :home collapsed?]
          [nav-link "#/about" "About" :about collapsed?]]]
@@ -50,10 +51,13 @@
 (defn home-page []
   [:div.container
    [:div.jumbotron
-    [:h1 "Welcome to FreeCodeCamp Tracker"]]
+    [:h1 "Welcome to freeCodeCamp Tracker"]]
    [:div.row
     [:div.col-md-12
-     [:h2 "TODO: display pictures"]]]])
+     [:h2 "TODO: display pictures"]]]
+   [:div.row
+    [:div.col-md-12
+     [nm/new-member-button]]]])
 
 (def pages
   {:home  #'home-page

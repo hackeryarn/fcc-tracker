@@ -1,4 +1,4 @@
-# FreeCodeCamp Tracker
+# freeCodeCamp Tracker
 
 I built this tool in order to track the progress of FreeCodeCamp. If you are in an organization
 that is using FreeCodeCamp as supplementary material, and you want a view into everyone's progress.
