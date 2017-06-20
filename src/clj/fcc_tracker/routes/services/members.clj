@@ -5,14 +5,15 @@
             [ring.util.http-response :as response :refer :all]))
 
 (defn create-member! [org member]
-  (if-let [error-message (v/member-creation-errors member)]
-    (response/precondition-failed {:result :error
-                                   :message error-message})
-    (try
-      (db/create-member!
-       (assoc member :organization org))
-      (ok {:result :ok})
-      (catch Exception e
-        (utils/handle-duplicate-error
-         e
-         "member with the selected FreeCodeCamp username already exists")))))
+  (let [org-member (assoc member :organization org)]
+    (if-let [error-message (v/member-creation-errors org-member)]
+      (response/precondition-failed {:result :error
+                                     :message error-message})
+      (try
+        (db/create-member!
+         org-member)
+        (ok {:result :ok})
+        (catch Exception e
+          (utils/handle-duplicate-error
+           e
+           "member with the selected FreeCodeCamp username already exists"))))))
