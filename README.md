@@ -1,8 +1,8 @@
-# fcc_tracker
+# FreeCodeCamp Tracker
 
-generated using Luminus version "2.9.11.60"
-
-FIXME
+I built this tool in order to track the progress of FreeCodeCamp. If you are in an organization
+that is using FreeCodeCamp as supplementary material, and you want a view into everyone's progress.
+This is the perfect tool for you.
 
 ## Prerequisites
 
@@ -18,4 +18,6 @@ To start a web server for the application, run:
 
 ## License
 
-Copyright © 2017 FIXME
+Copyright © 2017 Artem Chernyak
+
+Distributed uner the MIT License.
