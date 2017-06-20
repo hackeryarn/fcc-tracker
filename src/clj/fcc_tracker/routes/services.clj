@@ -1,7 +1,7 @@
 (ns fcc-tracker.routes.services
   (:require [fcc-tracker.routes.services.auth :as auth]
             [fcc-tracker.routes.services.members :as members]
-            [ring.middleware.format-params :refer [wrap-json-params]]
+            [ring.middleware.format-params :refer [wrap-restful-params]]
             [ring.util.http-response :refer :all]
             [ring.util.http-status :as http-status]
             [compojure.api.sweet :refer :all]
@@ -62,7 +62,8 @@
                                (members/create-member! org member))}})))
 
 (def service-routes
-  (middleware [[wrap-json-params]]
+  (middleware [[wrap-restful-params
+                :formats [:json-kw :edn :json :transit-json]]]
               public-service-routes
               (middleware [[m/wrap-auth]]
                           private-service-routes)))

@@ -1,8 +1,21 @@
 (ns fcc-tracker.components.new-member
-  (:require [reagent.core :as r]
-            [reagent.session :as session]
+  (:require [ajax.core :as ajax]
             [fcc-tracker.components.common :as c]
-            [fcc-tracker.validation :as v]))
+            [fcc-tracker.validation :as v]
+            [reagent.core :as r]
+            [reagent.session :as session]))
+
+(defn new-member! [fields errors]
+  (reset! errors (v/new-member-errors @fields))
+  (when-not @errors
+    (ajax/POST "/members"
+               {:params @fields
+                :handler #(do
+                            (reset! fields {})
+                            (session/remove! :modal))
+                :error-handler #(reset!
+                                 errors
+                                 {:server-error (get-in % [:response :message])})})))
 
 (defn new-member-form []
   (let [fields (r/atom {})
@@ -15,7 +28,7 @@
          [:strong "*required field"]]
         (when-let [error (first (:organization @error))]
           [:div.alert.alert-danger error])
-        [c/text-input "name" :id "enter member's name" fields]
+        [c/text-input "name" :name "enter member's name" fields]
         (when-let [error (first (:name @error))]
           [:div.alert.alert-danger error])
         [c/text-input "freeCodeCamp username" :fcc_username
@@ -26,6 +39,7 @@
           [:div.alert.alert-danger error])]
        [:div
         [:button.btn.btn-primary
+         {:on-click #(new-member! fields error)}
          "Create"]
         [:button.btn.btn-danger
          {:on-click #(session/remove! :modal)}
