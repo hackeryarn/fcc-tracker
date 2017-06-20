@@ -17,3 +17,6 @@
           (utils/handle-duplicate-error
            e
            "member with the selected FreeCodeCamp username already exists"))))))
+
+(defn list-members [org]
+  (ok (db/list-members {:organization org})))

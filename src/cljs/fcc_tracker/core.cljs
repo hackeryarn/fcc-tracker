@@ -24,8 +24,8 @@
      [:li.nav-item.btn-header
       [:a.dropdown-item
        {:on-click #(POST
-                    "/logout"
-                    {:handler (fn [] (session/remove! :identity))})}
+                     "/logout"
+                     {:handler (fn [] (session/remove! :identity))})}
        [:i.fa.fa-user] " " id " | sign out"]]]
     [:ul.nav.float-xs-right.navbar-nav
      [:li.nav-item.btn-header [l/login-button]]
@@ -55,9 +55,10 @@
    [:div.row
     [:div.col-md-12
      [:h2 "TODO: display pictures"]]]
-   [:div.row
-    [:div.col-md-12
-     [nm/new-member-button]]]])
+   (when (session/get :identity)
+     [:div.row
+      [:div.col-md-12
+       [nm/new-member-button]]])])
 
 (def pages
   {:home  #'home-page
@@ -76,10 +77,10 @@
 (secretary/set-config! :prefix "#")
 
 (secretary/defroute "/" []
-                    (session/put! :page :home))
+  (session/put! :page :home))
 
 (secretary/defroute "/about" []
-                    (session/put! :page :about))
+  (session/put! :page :about))
 
 ;; -------------------------
 ;; History
@@ -87,9 +88,9 @@
 (defn hook-browser-navigation! []
   (doto (History.)
     (events/listen
-      EventType/NAVIGATE
-      (fn [event]
-        (secretary/dispatch! (.-token event))))
+     EventType/NAVIGATE
+     (fn [event]
+       (secretary/dispatch! (.-token event))))
     (.setEnabled true)))
 
 ;; -------------------------

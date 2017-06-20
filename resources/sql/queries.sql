@@ -19,3 +19,8 @@ WHERE id = :id
 INSERT INTO members
 (organization, fcc_username, name)
 VALUES (:organization, :fcc_username, :name)
+
+-- :name list-members
+-- selects members from the given organization
+SELECT fcc_username, name FROM members
+WHERE organization = :organization

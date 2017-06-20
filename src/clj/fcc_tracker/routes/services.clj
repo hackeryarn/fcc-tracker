@@ -18,13 +18,8 @@
    :pass-confirm String})
 
 (s/defschema Member
-  {:organization String
-   :fcc_username String
+  {:fcc_username String
    :name String})
-
-(s/defschema NewMember
-  (dissoc Member :organization))
-
 
 (defapi public-service-routes
   {:swagger {:ui "/swagger-ui"
@@ -33,19 +28,19 @@
                            :title "FreeCodeCamp Tracker API"
                            :description "Public Services"}}}}
   (POST "/register" req
-        :return Result
-        :body [user OrgRegistration]
-        :summary "register a new organization"
-        (auth/register! req user))
+    :return Result
+    :body [user OrgRegistration]
+    :summary "register a new organization"
+    (auth/register! req user))
   (POST "/login" req
-        :header-params [authorization :- String]
-        :summary "log in the user and create a session"
-        :return Result
-        (auth/login! req authorization))
+    :header-params [authorization :- String]
+    :summary "log in the user and create a session"
+    :return Result
+    (auth/login! req authorization))
   (POST "/logout" []
-        :summary "remove user session"
-        :return Result
-        (auth/logout!)))
+    :summary "remove user session"
+    :return Result
+    (auth/logout!)))
 
 (defapi private-service-routes
   {:swagger {:ui "/swagger-ui-private"
@@ -54,12 +49,16 @@
                            :title "FreeCodeCamp Tracker API"
                            :description "Private Services"}}}}
   (context "/members" []
-           (resource
-            {:post {:parameters {:body-params NewMember}
-                    :responses {http-status/ok {:schema Result}}
-                    :summary "creates a new member for the current organization"
-                    :handler (fn [{member :body-params org :identity}]
-                               (members/create-member! org member))}})))
+    (resource
+     {:post {:parameters {:body-params Member}
+             :responses {http-status/ok {:schema Result}}
+             :summary "creates a new member for the current organization"
+             :handler (fn [{member :body-params org :identity}]
+                        (members/create-member! org member))}
+      :get {:responses {http-status/ok {:schema [Member]}}
+            :summary "returns a list of all users for the current organization"
+            :handler (fn [{org :identity}]
+                       (members/list-members org))}})))
 
 (def service-routes
   (middleware [[wrap-restful-params
