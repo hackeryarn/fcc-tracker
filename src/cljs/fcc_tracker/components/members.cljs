@@ -70,8 +70,6 @@
                (filter #(= username (:fcc_username (second %))))
                first
                first)]
-    (println progress)
-    (println i)
     (session/update-in! [:members-list i :progress](fn [_] progress))))
 
 (defn- update-progress [username res]
@@ -80,7 +78,6 @@
     (update-user-progress username "Not Found")))
 
 (defn- get-progress [member]
-  (println (str "member: " member))
   (let [username (:fcc_username member)]
     (ajax/GET (str "https://www.freecodecamp.com/" username)
       {:handler (partial update-progress username)

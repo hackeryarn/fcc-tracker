@@ -43,7 +43,8 @@
         [:a.navbar-brand {:href "#/"} "freeCodeCamp Tracker"]
         [:ul.nav.navbar-nav.float-xs-left
          [nav-link "#/" "Home" :home collapsed?]
-         [nav-link "#/members-list" "Members" :members collapsed?]]]
+         (when (session/get :identity)
+           [nav-link "#/members-list" "Members" :members collapsed?])]]
        [user-menu]])))
 
 (defn about-page []
