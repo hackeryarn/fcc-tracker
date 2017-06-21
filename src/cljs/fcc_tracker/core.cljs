@@ -4,6 +4,7 @@
             [fcc-tracker.components.login :as l]
             [fcc-tracker.components.registration :as reg]
             [fcc-tracker.components.new-member :as nm]
+            [fcc-tracker.components.members :as m]
             [goog.events :as events]
             [goog.history.EventType :as EventType]
             [reagent.core :as r]
@@ -42,7 +43,7 @@
         [:a.navbar-brand {:href "#/"} "freeCodeCamp Tracker"]
         [:ul.nav.navbar-nav.float-xs-left
          [nav-link "#/" "Home" :home collapsed?]
-         [nav-link "#/about" "About" :about collapsed?]]]
+         [nav-link "#/members-list" "Members" :members collapsed?]]]
        [user-menu]])))
 
 (defn about-page []
@@ -54,7 +55,7 @@
     [:h1 "Welcome to freeCodeCamp Tracker"]]
    [:div.row
     [:div.col-md-12
-     [:h2 "TODO: display pictures"]]]
+     [:h2 "TODO: add description"]]]
    (when (session/get :identity)
      [:div.row
       [:div.col-md-12
@@ -62,6 +63,7 @@
 
 (def pages
   {:home  #'home-page
+   :members #'m/members-page
    :about #'about-page})
 
 (defn modal []
@@ -78,6 +80,10 @@
 
 (secretary/defroute "/" []
   (session/put! :page :home))
+
+(secretary/defroute "/members-list" []
+  (m/fetch-member-list!)
+  (session/put! :page :members))
 
 (secretary/defroute "/about" []
   (session/put! :page :about))
