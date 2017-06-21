@@ -3,20 +3,20 @@
             [reagent.core :as r]
             [reagent.session :as session]))
 
-(defn partition-members [members]
+(defn- partition-members [members]
   (when (not-empty members)
     (vec (partition-all 20 members))))
 
-(defn back [i]
+(defn- back [i]
   (if (pos? i) (dec i) i))
 
-(defn nav-link [page i]
+(defn- nav-link [page i]
   [:li.page-item>a.page-link.btn.btn-primary
    {:on-click #(reset! page i)
     :class (when (= i @page) "active")}
    [:span i]])
 
-(defn forward [i pages]
+(defn- forward [i pages]
   (if (< i (dec pages)) (inc i) i))
 
 (defn pager [pages page]
@@ -34,7 +34,7 @@
          :class (when (= @page (dec pages)) "disabled")}
         [:span ">>"]]]))))
 
-(defn members-table [members]
+(defn- members-table [members]
   [:table.table.table-striped
    [:thead
     [:tr
@@ -51,7 +51,7 @@
   (let [page (r/atom 0)]
     (fn []
       [:div.container
-       (when-let [members (partition-members (session/get! :members-list))]
+       (when-let [members (partition-members (session/get :members-list))]
          [:div.row>div.col-md-12
           [pager (count members) page]
           [members-table (members @page)]])])))
