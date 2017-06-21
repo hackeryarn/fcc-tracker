@@ -1,6 +1,7 @@
 (ns fcc-tracker.components.members
   (:require [ajax.core :as ajax]
             [reagent.core :as r]
+            [fcc-tracker.components.new-member :as nm]
             [reagent.session :as session]))
 
 (defn- partition-members [members]
@@ -45,7 +46,7 @@
       ^{:key (member :fcc_username)}
       [:tr
        [:td (member :name)]
-       [:th (member :fcc_username)]])]])
+       [:th (member :progress)]])]])
 
 (defn members-page []
   (let [page (r/atom 0)]
@@ -54,8 +55,43 @@
        (when-let [members (partition-members (session/get :members-list))]
          [:div.row>div.col-md-12
           [pager (count members) page]
-          [members-table (members @page)]])])))
+          [members-table (members @page)]])
+       [:div.row>div.col-md-12
+        [nm/new-member-button]]])))
+
+(defn- parse-progress-response [res]
+  (->> res
+       (re-find #"<h1 .+?>\[ (.+) \].+?h1>")
+       last))
+
+(defn- update-user-progress [username progress]
+  (let [imembers (map-indexed vector (session/get :members-list))
+        i (->> imembers
+               (filter #(= username (:fcc_username (second %))))
+               first
+               first)]
+    (println progress)
+    (println i)
+    (session/update-in! [:members-list i :progress](fn [_] progress))))
+
+(defn- update-progress [username res]
+  (if-let [progress (parse-progress-response res)]
+    (update-user-progress username progress)
+    (update-user-progress username "Not Found")))
+
+(defn- get-progress [member]
+  (println (str "member: " member))
+  (let [username (:fcc_username member)]
+    (ajax/GET (str "https://www.freecodecamp.com/" username)
+      {:handler (partial update-progress username)
+       :error-handler println})))
+
+(defn- init-members-list [res]
+  (doseq [member res] (get-progress member))
+  (let [l (vec (map #(assoc % :progress "Loading...") res))]
+    (session/put! :members-list l)))
 
 (defn fetch-member-list! []
-  (ajax/GET (str "/members")
-            {:handler #(session/put! :members-list %)}))
+  (ajax/GET "/members"
+    {:handler init-members-list}))
+
