@@ -12,7 +12,7 @@
                  [cprop "0.1.10"]
                  [funcool/struct "1.0.0"]
                  [luminus-immutant "0.2.3"]
-                 [luminus-migrations "0.3.5"]
+                 [luminus-migrations "0.3.7"]
                  [luminus-nrepl "0.1.4"]
                  [luminus/ring-ttl-session "0.3.2"]
                  [markdown-clj "0.9.99"]

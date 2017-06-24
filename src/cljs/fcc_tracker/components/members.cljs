@@ -43,10 +43,11 @@
      [:th "Progress"]]]
    [:tbody
     (for [member members]
-      ^{:key (member :fcc_username)}
+      ^{:key (:fcc_username member)}
       [:tr
-       [:td (member :name)]
-       [:th (member :progress)]])]])
+       [:td [:a {:href (str "http://www.freecodecamp.com/" (:fcc_username member))}
+             (:name member)]]
+       [:th (:progress member)]])]])
 
 (defn members-page []
   (let [page (r/atom 0)]
@@ -77,7 +78,7 @@
     (update-user-progress username progress)
     (update-user-progress username "Not Found")))
 
-(defn- get-progress [member]
+(defn get-progress [member]
   (let [username (:fcc_username member)]
     (ajax/GET (str "https://www.freecodecamp.com/" username)
       {:handler (partial update-progress username)
