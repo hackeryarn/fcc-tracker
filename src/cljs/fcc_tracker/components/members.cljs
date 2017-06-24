@@ -42,9 +42,10 @@
   [:table.table.table-striped
    [:thead
     [:tr
-     [:th [:a.fa.fa-check {:on-click #(sort-members :name)}]
-      "Name"]
-     [:th "Progress"]]]
+     [:th "Name "
+      [:a.fa.fa-sort {:on-click #(sort-members :name)}]]
+     [:th "Progress "
+      [:a.fa.fa-sort {:on-click #(sort-members :progress)}]]]]
    [:tbody
     (for [member members]
       ^{:key (:fcc_username member)}
