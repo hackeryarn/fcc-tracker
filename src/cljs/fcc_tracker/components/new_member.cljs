@@ -1,14 +1,41 @@
 (ns fcc-tracker.components.new-member
   (:require [ajax.core :as ajax]
             [fcc-tracker.components.common :as c]
-            [fcc-tracker.components.members :refer [get-progress]]
             [fcc-tracker.validation :as v]
             [reagent.core :as r]
             [reagent.session :as session]))
 
-(defn- add-member [fields list]
-  (get-progress fields)
-  (->> (assoc fields :progress "Loading...")
+(defn- parse-progress-response [res]
+  (->> res
+       (re-find #"<h1 .+?>\[ (.+) \].+?h1>")
+       last))
+
+(defn- update-user-progress [username progress]
+  (let [imembers (map-indexed vector (session/get :members-list))
+        i (->> imembers
+               (filter #(= username (:fcc_username (second %))))
+               first
+               first)]
+    (session/update-in! [:members-list i :progress] (fn [_] progress))))
+
+(defn- update-progress [username res]
+  (if-let [progress (parse-progress-response res)]
+    (update-user-progress username progress)
+    (update-user-progress username "Not Found")))
+
+(defn- get-progress [member]
+  (let [username (:fcc_username member)]
+    (ajax/GET (str "https://www.freecodecamp.com/" username)
+      {:handler (partial update-progress username)
+       :error-handler println})))
+
+(defn member-progress [member]
+  (get-progress member)
+  (assoc member :progress "Loading..."))
+
+(defn- add-member [member list]
+  (->> member
+       member-progress
        (conj list)))
 
 (defn- handler [fields res]

@@ -12,7 +12,7 @@
                  [cprop "0.1.10"]
                  [funcool/struct "1.0.0"]
                  [luminus-immutant "0.2.3"]
-                 [luminus-migrations "0.3.7"]
+                 [luminus-migrations "0.3.8"]
                  [luminus-nrepl "0.1.4"]
                  [luminus/ring-ttl-session "0.3.2"]
                  [markdown-clj "0.9.99"]
@@ -45,7 +45,9 @@
   :resource-paths ["resources" "target/cljsbuild"]
   :target-path "target/%s/"
   :main ^:skip-aot fcc-tracker.core
-  :migratus {:store :database :db ~(get (System/getenv) "DATABASE_URL")}
+  :migratus {:store :database
+             :init-in-transaction? true
+             :db ~(get (System/getenv) "DATABASE_URL")}
 
   :plugins [[lein-cprop "1.0.3"]
             [migratus-lein "0.4.9"]

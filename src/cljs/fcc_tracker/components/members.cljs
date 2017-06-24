@@ -35,11 +35,15 @@
          :class (when (= @page (dec pages)) "disabled")}
         [:span ">>"]]]))))
 
+(defn- sort-members [k]
+  (session/update! :members-list #(sort-by k (session/get :members-list))))
+
 (defn- members-table [members]
   [:table.table.table-striped
    [:thead
     [:tr
-     [:th "Name"]
+     [:th [:a.fa.fa-check {:on-click #(sort-members :name)}]
+      "Name"]
      [:th "Progress"]]]
    [:tbody
     (for [member members]
@@ -60,34 +64,9 @@
        [:div.row>div.col-md-12
         [nm/new-member-button]]])))
 
-(defn- parse-progress-response [res]
-  (->> res
-       (re-find #"<h1 .+?>\[ (.+) \].+?h1>")
-       last))
-
-(defn- update-user-progress [username progress]
-  (let [imembers (map-indexed vector (session/get :members-list))
-        i (->> imembers
-               (filter #(= username (:fcc_username (second %))))
-               first
-               first)]
-    (session/update-in! [:members-list i :progress](fn [_] progress))))
-
-(defn- update-progress [username res]
-  (if-let [progress (parse-progress-response res)]
-    (update-user-progress username progress)
-    (update-user-progress username "Not Found")))
-
-(defn get-progress [member]
-  (let [username (:fcc_username member)]
-    (ajax/GET (str "https://www.freecodecamp.com/" username)
-      {:handler (partial update-progress username)
-       :error-handler println})))
 
 (defn- init-members-list [res]
-  (doseq [member res] (get-progress member))
-  (let [l (vec (map #(assoc % :progress "Loading...") res))]
-    (session/put! :members-list l)))
+  (session/put! :members-list (mapv nm/member-progress res)))
 
 (defn fetch-member-list! []
   (ajax/GET "/members"
