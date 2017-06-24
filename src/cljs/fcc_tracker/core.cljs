@@ -83,8 +83,9 @@
   (session/put! :page :home))
 
 (secretary/defroute "/members-list" []
-  (m/fetch-member-list!)
-  (session/put! :page :members))
+  (when (session/get :identity)
+    (m/fetch-member-list!)
+    (session/put! :page :members)))
 
 (secretary/defroute "/about" []
   (session/put! :page :about))

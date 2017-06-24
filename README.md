@@ -10,11 +10,23 @@ You will need [Leiningen][1] 2.0 or above installed.
 
 [1]: https://github.com/technomancy/leiningen
 
+Postgres with postgres user setup.
+
+## Setup
+
+Run migrations
+
+    lein run migrate
+
 ## Running
 
 To start a web server for the application, run:
 
     lein run
+    
+In another terminal window start figwheel for ClojureScript compilation:
+
+    lein figwheel
 
 ## License
 
