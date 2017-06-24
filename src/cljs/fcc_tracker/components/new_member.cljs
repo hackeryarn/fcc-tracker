@@ -1,21 +1,30 @@
 (ns fcc-tracker.components.new-member
   (:require [ajax.core :as ajax]
             [fcc-tracker.components.common :as c]
+            [fcc-tracker.components.members :refer [get-progress]]
             [fcc-tracker.validation :as v]
             [reagent.core :as r]
             [reagent.session :as session]))
+
+(defn- add-member [fields list]
+  (get-progress fields)
+  (->> (assoc fields :progress "Loading...")
+       (conj list)))
+
+(defn- handler [fields res]
+  (session/update! :members-list (partial add-member @fields))
+  (reset! fields {})
+  (session/remove! :modal))
 
 (defn new-member! [fields errors]
   (reset! errors (v/new-member-errors @fields))
   (when-not @errors
     (ajax/POST "/members"
-               {:params @fields
-                :handler #(do
-                            (reset! fields {})
-                            (session/remove! :modal))
-                :error-handler #(reset!
-                                 errors
-                                 {:server-error (get-in % [:response :message])})})))
+      {:params @fields
+       :handler (partial handler fields)
+       :error-handler #(reset!
+                        errors
+                        {:server-error (get-in % [:response :message])})})))
 
 (defn new-member-form []
   (let [fields (r/atom {})
