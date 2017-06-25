@@ -14,7 +14,9 @@ Postgres with postgres user setup.
 
 ## Setup
 
-Reference to `init.sql` and use the commends provided to create a database in psql.
+Create database
+
+    lein run init
 
 Run migrations
 
