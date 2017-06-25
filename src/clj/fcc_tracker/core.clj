@@ -48,8 +48,17 @@
   (migrations/migrate ["migrate"] (select-keys env [:database-url]))
   (.addShutdownHook (Runtime/getRuntime) (Thread. stop-app)))
 
+(defn remove-db-name [url]
+  (when url
+    (clojure.string/replace url #"(\/\/.*\/)(.*)(\?)" "$1$3")))
+
 (defn -main [& args]
   (cond
+    (some #{"init"} args)
+    (do
+      (mount/start #'fcc-tracker.config/env)
+      (migrations/init {:db (remove-db-name (:database-url env))})
+      (System/exit 0))
     (some #{"migrate" "rollback"} args)
     (do
       (mount/start #'fcc-tracker.config/env)
