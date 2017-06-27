@@ -3,7 +3,6 @@
             [fcc-tracker.ajax :refer [load-interceptors!]]
             [fcc-tracker.components.login :as l]
             [fcc-tracker.components.registration :as reg]
-            [fcc-tracker.components.new-member :as nm]
             [fcc-tracker.components.members :as m]
             [goog.events :as events]
             [goog.history.EventType :as EventType]
@@ -65,7 +64,10 @@ classes, you've probably wanted a way to track the class progress easily."]
      [:p "That's exactly what this tracker lets you do. Just register your organization and add
 your organization members. All we need is a name and their freeCodeCamp username. Then we will
 gather everyone's progress."]]]
-   [:div.btn.btn-primary.btn-lg.text-center.promo-btn "Register Now!"]
+   (when-not (session/get :identity)
+     [:div.btn.btn-primary.btn-lg.text-center.promo-btn
+      {:on-click #(session/put! :modal reg/registration-form)}
+      "Register Now!"])
    [:h2 "Contribute"]
    [:div.row
     [:div.col-md-12

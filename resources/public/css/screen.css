@@ -141,6 +141,11 @@ a:not([href]):not([tabindex]).active {
     color: #006400;
 }
 
+a:not([href]):not([tabindex]).heading {
+    color: black;
+    cursor: pointer;
+}
+
 .btn-primary.active {
     border: 2px solid #006400;
     padding: 10px 22px;
