@@ -129,6 +129,30 @@ body {
     color: #ddd;
 }
 
+a:not([href]):not([tabindex]) {
+    color: white;
+}
+
+a:not([href]):not([tabindex]):hover {
+    color: #ddd;
+}
+
+a:not([href]):not([tabindex]).active {
+    color: #006400;
+}
+
+.btn-primary.active {
+    border: 2px solid #006400;
+    padding: 10px 22px;
+    color: #006400;
+    background: none;
+}
+
+.btn-primary.active:hover {
+    border: 2px solid #006400;
+    background: none;
+}
+
 .separator {
     border: 1px solid white;
     width: 0;

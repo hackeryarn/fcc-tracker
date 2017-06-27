@@ -6,7 +6,7 @@
 
 (defn- partition-members [members]
   (when (not-empty members)
-    (vec (partition-all 20 members))))
+    (vec (partition-all 10 members))))
 
 (defn- back [i]
   (if (pos? i) (dec i) i))
