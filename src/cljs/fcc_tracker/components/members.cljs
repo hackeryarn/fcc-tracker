@@ -58,10 +58,14 @@
   (let [page (r/atom 0)]
     (fn []
       [:div.container
-       (when-let [members (partition-members (session/get :members-list))]
+       [:h2 "Organization Members"]
+       (if-let [members (partition-members (session/get :members-list))]
          [:div.row>div.col-md-12
           [pager (count members) page]
-          [members-table (members @page)]])
+          [members-table (members @page)]]
+         [:div.row>div.col-md-12
+          [:p "It doesn't look like you have any members yet. Click the button below
+to add some."]])
        [:div.row>div.col-md-12
         [nm/new-member-button]]])))
 
