@@ -1,6 +1,6 @@
-(defproject fcc_tracker "0.1.0-SNAPSHOT"
+(defproject fcc_tracker "0.1.0"
 
-  :description "FIXME: write description"
+  :description "An appication for tracking group progress through freeCodeCamp."
   :url "http://example.com/FIXME"
 
   :dependencies [[buddy "1.3.0"]
@@ -12,7 +12,7 @@
                  [cprop "0.1.10"]
                  [funcool/struct "1.0.0"]
                  [luminus-immutant "0.2.3"]
-                 [luminus-migrations "0.3.8"]
+                 [luminus-migrations "0.3.9"]
                  [luminus-nrepl "0.1.4"]
                  [luminus/ring-ttl-session "0.3.2"]
                  [markdown-clj "0.9.99"]

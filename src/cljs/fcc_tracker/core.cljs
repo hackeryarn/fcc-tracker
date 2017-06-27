@@ -44,7 +44,12 @@
         [:ul.nav.navbar-nav.float-xs-left
          [nav-link "#/" "Home" :home collapsed?]
          (when (session/get :identity)
-           [nav-link "#/members-list" "Members" :members collapsed?])]]
+           [nav-link "#/members-list" "Members" :members collapsed?])
+         (when @collapsed?
+           [:li.nav-item.separator])
+         [:li.nav-item.active
+          [:a.nav-link {:href "https://github.com/achernyak/fcc-tracker"}
+           [:i.fa.fa-github]]]]]
        [user-menu]])))
 
 (defn about-page []
@@ -52,15 +57,19 @@
 
 (defn home-page []
   [:div.container
-   [:div.jumbotron
-    [:h1 "Welcome to freeCodeCamp Tracker"]]
+   [:h1 "Welcome to freeCodeCamp Tracker"]
    [:div.row
     [:div.col-md-12
-     [:h2 "TODO: add description"]]]
-   (when (session/get :identity)
-     [:div.row
-      [:div.col-md-12
-       [nm/new-member-button]]])])
+     [:p "If you run an organization that uses freeCodeCamp as supplementary material to your
+classes, you've probably wanted a way to track the class progress easily."]
+     [:p "That's exactly what this tracker lets you do. Just register your organization and add
+your organization members. All we need is a name and their freeCodeCamp username. Then we will
+gather everyone's progress."]]]
+   [:div.btn.btn-primary.btn-lg.text-center.promo-btn "Register Now!"]
+   [:h2 "Contribute"]
+   [:div.row
+    [:div.col-md-12
+     [:p "We are open source, so please feel free to ask for any features or contribute yourself!"]]]])
 
 (def pages
   {:home  #'home-page

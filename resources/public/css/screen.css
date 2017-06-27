@@ -80,6 +80,10 @@ body {
     z-index: 1;
 }
 
+.btn {
+    margin: 0 0.1em;
+}
+
 .bg-green {
     background: #006400;
 }
@@ -125,3 +129,22 @@ body {
     color: #ddd;
 }
 
+.separator {
+    border: 1px solid white;
+    width: 0;
+    height: 2em;
+}
+
+.nav-item {
+    font-weight: 600;
+}
+
+h1, h2, h3 {
+    margin: 1em 0 0.25em 0;
+}
+
+.promo-btn {
+    display: block;
+    margin: 1em auto;
+    max-width: 400px;
+}
