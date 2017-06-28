@@ -94,9 +94,10 @@ gather everyone's progress."]]]
   (session/put! :page :home))
 
 (secretary/defroute "/members-list" []
-  (when (session/get :identity)
-    (m/fetch-member-list!)
-    (session/put! :page :members)))
+  (if (session/get :identity)
+    (do (m/fetch-member-list!)
+        (session/put! :page :members))
+    (session/put! :page :home)))
 
 (secretary/defroute "/about" []
   (session/put! :page :about))
