@@ -70,8 +70,6 @@
     (fn []
       [:div.container
        [:h2 "Organization Members"]
-       (when (session/get :identity)
-         (m/fetch-member-list!))
        (if-let [members (partition-members (session/get :members-list))]
          [:div.row>div.col-md-12
           [pager (count members) page]

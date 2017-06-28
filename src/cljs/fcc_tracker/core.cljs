@@ -86,6 +86,12 @@ gather everyone's progress."]]]
   [:div
    [modal]
    [(pages (session/get :page))]])
+
+(defn set-hash!
+  "Set the location hash of a js/window object." 
+  ([v] (set-hash! (.-location js/window) v))
+  ([loc v] (aset loc "hash" v)
+   (secretary/dispatch! v)))
 ;; -------------------------
 ;; Routes
 (secretary/set-config! :prefix "#")
@@ -94,7 +100,10 @@ gather everyone's progress."]]]
   (session/put! :page :home))
 
 (secretary/defroute "/members-list" []
-  (session/put! :page :members))
+  (if (session/get :identity)
+    (do (m/fetch-member-list!)
+        (session/put! :page :members))
+    (set-hash! "/")))
 
 (secretary/defroute "/about" []
   (session/put! :page :about))
@@ -118,6 +127,6 @@ gather everyone's progress."]]]
 
 (defn init! []
   (load-interceptors!)
-  (hook-browser-navigation!)
   (session/put! :identity js/identity)
+  (hook-browser-navigation!)
   (mount-components))
