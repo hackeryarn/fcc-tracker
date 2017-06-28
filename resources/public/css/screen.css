@@ -177,3 +177,8 @@ h1, h2, h3 {
     margin: 1em auto;
     max-width: 400px;
 }
+
+.profile {
+    height: 2.5em;
+    margin: -1em 1em -1em 0;
+}

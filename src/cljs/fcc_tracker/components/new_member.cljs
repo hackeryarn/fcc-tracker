@@ -2,6 +2,8 @@
   (:require [ajax.core :as ajax]
             [fcc-tracker.components.common :as c]
             [fcc-tracker.validation :as v]
+            [hickory.core :as hickory]
+            [hickory.select :as s]
             [reagent.core :as r]
             [reagent.session :as session]))
 
@@ -10,32 +12,41 @@
        (re-find #"<h1 .+?>\[ (.+) \].+?h1>")
        last))
 
-(defn- update-user-progress [username progress]
+(defn- update-member [username key value]
   (let [imembers (map-indexed vector (session/get :members-list))
         i (->> imembers
                (filter #(= username (:fcc_username (second %))))
                first
                first)]
-    (session/update-in! [:members-list i :progress] (fn [_] progress))))
+    (session/update-in! [:members-list i key] (fn [_] value))))
 
-(defn- update-progress [username res]
+(defn- parse-profile-img [res]
+  (let [body (-> res hickory/parse hickory/as-hickory)]
+    (-> (s/select (s/class "public-profile-img") body)
+        first
+        :attrs
+        :src)))
+
+(defn- update-data [username res]
   (if-let [progress (parse-progress-response res)]
-    (update-user-progress username progress)
-    (update-user-progress username "Not Found")))
+    (update-member username :progress progress)
+    (update-member username :progress "Not Found"))
+  (when-let [img (parse-profile-img res)]
+    (update-member username :profile-img img)))
 
-(defn- get-progress [member]
+(defn- get-data [member]
   (let [username (:fcc_username member)]
     (ajax/GET (str "https://www.freecodecamp.com/" username)
-      {:handler (partial update-progress username)
+      {:handler (partial update-data username)
        :error-handler println})))
 
-(defn member-progress [member]
-  (get-progress member)
+(defn member-data [member]
+  (get-data member)
   (assoc member :progress "Loading..."))
 
 (defn- add-member [member list]
   (->> member
-       member-progress
+       member-data
        (conj list)))
 
 (defn- handler [fields res]

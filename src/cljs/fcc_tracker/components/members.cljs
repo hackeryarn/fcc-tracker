@@ -1,7 +1,6 @@
 (ns fcc-tracker.components.members
   (:require [ajax.core :as ajax]
             [reagent.core :as r]
-            [hickory.select :as s]
             [fcc-tracker.components.new-member :as nm]
             [reagent.session :as session]))
 
@@ -54,6 +53,8 @@
        (let [username (:fcc_username member)]
          [:td [:a {:href (str "http://www.freecodecamp.com/" username)
                    :title username}
+               (when-let [img (:profile-img member)]
+                 [:img.profile {:src img}])
                (:name member)]])
        [:th (:progress member)]])]])
 
@@ -74,7 +75,7 @@ to add some."]])
 
 
 (defn- init-members-list [res]
-  (session/put! :members-list (mapv nm/member-progress res)))
+  (session/put! :members-list (mapv nm/member-data res)))
 
 (defn fetch-member-list! []
   (ajax/GET "/members"
