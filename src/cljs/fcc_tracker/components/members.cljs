@@ -58,11 +58,20 @@
                (:name member)]])
        [:th (:progress member)]])]])
 
+(defn- init-members-list [res]
+  (session/put! :members-list (mapv nm/member-data res)))
+
+(defn fetch-member-list! []
+  (ajax/GET "/members"
+            {:handler init-members-list}))
+
 (defn members-page []
   (let [page (r/atom 0)]
     (fn []
       [:div.container
        [:h2 "Organization Members"]
+       (when (session/get :identity)
+         (m/fetch-member-list!))
        (if-let [members (partition-members (session/get :members-list))]
          [:div.row>div.col-md-12
           [pager (count members) page]
@@ -74,10 +83,4 @@ to add some."]])
         [nm/new-member-button]]])))
 
 
-(defn- init-members-list [res]
-  (session/put! :members-list (mapv nm/member-data res)))
-
-(defn fetch-member-list! []
-  (ajax/GET "/members"
-    {:handler init-members-list}))
 
