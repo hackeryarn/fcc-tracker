@@ -4,6 +4,7 @@
   :url "http://example.com/FIXME"
 
   :dependencies [[buddy "1.3.0"]
+                 [cider/cider-nrepl "0.15.0-SNAPSHOT"]
                  [clj-time "0.13.0"]
                  [cljs-ajax "0.6.0"]
                  [compojure "1.6.0"]
