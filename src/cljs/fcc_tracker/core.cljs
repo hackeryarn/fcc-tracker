@@ -2,8 +2,9 @@
   (:require [ajax.core :refer [POST]]
             [fcc-tracker.ajax :refer [load-interceptors!]]
             [fcc-tracker.components.login :as l]
-            [fcc-tracker.components.registration :as reg]
             [fcc-tracker.components.members :as m]
+            [fcc-tracker.components.registration :as reg]
+            [fcc-tracker.utils :as u]
             [goog.events :as events]
             [goog.history.EventType :as EventType]
             [reagent.core :as r]
@@ -18,6 +19,10 @@
     {:href uri
      :on-click #(reset! collapsed? true)} title]])
 
+(defn logout []
+  (session/remove! :identity)
+  (u/redirect! "/"))
+
 (defn user-menu []
   (if-let [id (session/get :identity)]
     [:ul.nav.navbar-nav.float-xs-right
@@ -25,7 +30,7 @@
       [:a.dropdown-item
        {:on-click #(POST
                      "/logout"
-                     {:handler (fn [] (session/remove! :identity))})}
+                     {:handler logout })}
        [:i.fa.fa-user] " " id " | sign out"]]]
     [:ul.nav.float-xs-right.navbar-nav
      [:li.nav-item.btn-header [l/login-button]]
@@ -87,11 +92,6 @@ gather everyone's progress."]]]
    [modal]
    [(pages (session/get :page))]])
 
-(defn set-hash!
-  "Set the location hash of a js/window object." 
-  ([v] (set-hash! (.-location js/window) v))
-  ([loc v] (aset loc "hash" v)
-   (secretary/dispatch! v)))
 ;; -------------------------
 ;; Routes
 (secretary/set-config! :prefix "#")
@@ -103,7 +103,7 @@ gather everyone's progress."]]]
   (if (session/get :identity)
     (do (m/fetch-member-list!)
         (session/put! :page :members))
-    (set-hash! "/")))
+    (u/redirect! "/")))
 
 (secretary/defroute "/about" []
   (session/put! :page :about))
