@@ -182,3 +182,14 @@ h1, h2, h3 {
     height: 2.5em;
     margin: -1em 1em -1em 0;
 }
+
+.delete {
+    cursor: pointer;
+    font-size: 150%;
+    line-height: 1px;
+    margin: -12px 0;
+}
+
+.delete:hover i {
+    color: red !important;
+}

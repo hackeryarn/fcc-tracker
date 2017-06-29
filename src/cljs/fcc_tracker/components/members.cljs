@@ -36,7 +36,19 @@
         [:span ">>"]]]))))
 
 (defn- sort-members [k]
-  (session/update! :members-list #(sort-by k (session/get :members-list))))
+  (session/update!
+   :members-list
+   #(sort-by k (session/get :members-list))))
+
+(defn- remove-member [username]
+  (session/update!
+   :members-list
+   (fn [members]
+     (remove #(= (:fcc_username %) username) members))))
+
+(defn- delete-member [username]
+  (ajax/DELETE (str "/members/" username)
+    {:handler (remove-member username)}))
 
 (defn- members-table [members]
   [:table.table.table-striped
@@ -45,25 +57,28 @@
      [:th [:a.heading {:on-click #(sort-members :name)}
            "Name " [:i.fa.fa-sort]]]
      [:th [:a.heading {:on-click #(sort-members :progress)}
-           "Progress " [:i.fa.fa-sort] ]]]]
+           "Progress " [:i.fa.fa-sort]]]
+     [:th ""]]]
    [:tbody
     (for [member members]
-      ^{:key (:fcc_username member)}
-      [:tr
-       (let [username (:fcc_username member)]
+      (let [username (:fcc_username member)]
+        ^{:key username}
+        [:tr
          [:td [:a {:href (str "http://www.freecodecamp.com/" username)
                    :title username}
                (when-let [img (:profile-img member)]
                  [:img.profile {:src img}])
-               (:name member)]])
-       [:th (:progress member)]])]])
+               (:name member)]]
+         [:th (:progress member)]
+         [:td [:a.delete {:on-click #(delete-member username)}
+               [:i.fa.fa-times.text-danger]]]]))]])
 
 (defn- init-members-list [res]
   (session/put! :members-list (mapv nm/member-data res)))
 
 (defn fetch-member-list! []
   (ajax/GET "/members"
-            {:handler init-members-list}))
+    {:handler init-members-list}))
 
 (defn members-page []
   (let [page (r/atom 0)]
@@ -79,6 +94,4 @@
 to add some."]])
        [:div.row>div.col-md-12
         [nm/new-member-button]]])))
-
-
 
