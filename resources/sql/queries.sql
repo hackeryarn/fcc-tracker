@@ -24,3 +24,9 @@ VALUES (:organization, :fcc_username, :name)
 -- selects members from the given organization
 SELECT fcc_username, name FROM members
 WHERE organization = :organization
+
+-- :name delete-member! :! :n
+-- deletes the member with the give username and org
+DELETE FROM members
+WHERE fcc_username = :fcc_username
+AND organization = :organization

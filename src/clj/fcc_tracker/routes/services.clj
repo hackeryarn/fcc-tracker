@@ -28,13 +28,13 @@
                            :title "FreeCodeCamp Tracker API"
                            :description "Public Services"}}}}
   (POST "/register" req
-    :return Result
-    :body [user OrgRegistration]
     :summary "register a new organization"
+    :body [user OrgRegistration]
+    :return Result
     (auth/register! req user))
   (POST "/login" req
-    :header-params [authorization :- String]
     :summary "log in the user and create a session"
+    :header-params [authorization :- String]
     :return Result
     (auth/login! req authorization))
   (POST "/logout" []
@@ -50,15 +50,24 @@
                            :description "Private Services"}}}}
   (context "/members" []
     (resource
-     {:post {:parameters {:body-params Member}
+     {:tags ["members"]
+      :post {:summary "creates a new member for the current organization"
+             :parameters {:body-params Member}
              :responses {http-status/ok {:schema Result}}
-             :summary "creates a new member for the current organization"
              :handler (fn [{member :body-params org :identity}]
                         (members/create-member! org member))}
-      :get {:responses {http-status/ok {:schema [Member]}}
-            :summary "returns a list of all users for the current organization"
+      :get {:summary "returns a list of all users for the current organization"
+            :responses {http-status/ok {:schema [Member]}}
             :handler (fn [{org :identity}]
-                       (members/list-members org))}})))
+                       (members/list-members org))}}))
+  (context "/members/:username" []
+    :path-params [username :- String]
+    (resource
+     {:tags ["members"]
+      :delete {:summary "delete the given member from the current org"
+               :responses {http-status/ok {:schema Result}}
+               :handler (fn [{org :identity}]
+                          (members/delete-member! org username))}})))
 
 (def service-routes
   (middleware [[wrap-restful-params

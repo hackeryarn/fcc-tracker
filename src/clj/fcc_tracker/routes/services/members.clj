@@ -20,3 +20,7 @@
 
 (defn list-members [org]
   (ok (db/list-members {:organization org})))
+
+(defn delete-member! [org username]
+  (db/delete-member! {:organization org :fcc_username username})
+  (ok {:result :ok}))
