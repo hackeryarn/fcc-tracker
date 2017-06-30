@@ -31,6 +31,12 @@ To start a web server for the application, run:
 In another terminal window start figwheel for ClojureScript compilation:
 
     lein figwheel
+    
+## Testing
+
+To run all project tests
+
+    lein test
 
 ## License
 
