@@ -1,5 +1,7 @@
 # freeCodeCamp Tracker
 
+[Hosted at freecodecamp-tracker.achernyak.me](http://freecodecamp-tracker.achernyak.me/)
+
 I built this tool in order to track the progress of FreeCodeCamp. If you are in an organization
 that is using FreeCodeCamp as supplementary material, and you want a view into everyone's progress.
 This is the perfect tool for you.
