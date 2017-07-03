@@ -57,6 +57,17 @@
          (= {:result "ok"}
             (parse-response body))))))
 
+  (testing "registration short password"
+    (with-redefs [fcc-tracker.db.core/create-org! mock-create-org]
+      (let [{:keys [body status]}
+            ((app) (register-request "foo" "bar" "bar"))]
+        (is
+         (= 412 status))
+        (is
+         (= {:result "error"
+             :message {:pass "password must contain at least 8 characters"}}
+            (parse-response body))))))
+
   (testing "registration duplicate user"
     (with-redefs [fcc-tracker.db.core/create-org! mock-create-org]
       (let [{:keys [body status]}
