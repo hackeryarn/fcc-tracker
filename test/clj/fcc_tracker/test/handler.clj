@@ -27,10 +27,17 @@
                               :pass pass
                               :pass-confirm pass-confirm}))))
 
-(defn mock-create-org [{:keys [id pass pass-confirm ]}]
-  (when (and (= id "foo")
-             (= pass "password1")
-             (= pass-confirm "password1"))
+(defn mock-create-org [{:keys [id pass pass-confirm]}]
+  (cond
+    (= id "duplicate")
+    (let [test-ex (java.sql.SQLException. "ERROR: duplicate key value")
+          batch-ex (java.sql.BatchUpdateException.)]
+      (.setNextException batch-ex test-ex)
+      (throw batch-ex))
+
+    (and (= id "foo")
+         (= pass "password1")
+         (= pass-confirm "password1"))
     {:id "foo"
      :pass (hashers/encrypt "bar")}))
 
@@ -71,12 +78,12 @@
   (testing "registration duplicate user"
     (with-redefs [fcc-tracker.db.core/create-org! mock-create-org]
       (let [{:keys [body status]}
-            ((app) (register-request "foo" "bar" "bar"))]
+            ((app) (register-request "duplicate" "password1" "password1"))]
         (is
          (= 412 status))
         (is
          (= {:result "error"
-             :message {:pass "password must contain at least 8 characters"}}
+             :message "user with the selected ID already exists"}
             (parse-response body))))))
 
   ;; login
@@ -97,3 +104,4 @@
         (is
          (= {:result "unauthorized" :message "login failed"}
             (parse-response body)))))))
+
