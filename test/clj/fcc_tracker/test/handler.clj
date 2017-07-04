@@ -88,6 +88,39 @@
              :message {:pass "password must contain at least 8 characters"}}
             (parse-response body))))))
 
+  (testing "registration wrong confirmation"
+    (with-redefs [fcc-tracker.db.core/create-org! mock-create-org]
+      (let [{:keys [body status]}
+            ((app) (register-request "foo" "password1" "xxx"))]
+        (is
+         (= 412 status))
+        (is
+         (= {:result "error"
+             :message {:pass "does not match"}}
+            (parse-response body))))))
+
+  (testing "registration blank id"
+    (with-redefs [fcc-tracker.db.core/create-org! mock-create-org]
+      (let [{:keys [body status]}
+            ((app) (register-request "" "password1" "password1"))]
+        (is
+         (= 412 status))
+        (is
+         (= {:result "error"
+             :message {:id "this field is mandatory"}}
+            (parse-response body))))))
+
+  (testing "registration blank pass"
+    (with-redefs [fcc-tracker.db.core/create-org! mock-create-org]
+      (let [{:keys [body status]}
+            ((app) (register-request "foo" "" "password1"))]
+        (is
+         (= 412 status))
+        (is
+         (= {:result "error"
+             :message {:pass "this field is mandatory"}}
+            (parse-response body))))))
+
   (testing "registration duplicate user"
     (with-redefs [fcc-tracker.db.core/create-org! mock-create-org]
       (let [{:keys [body status]}
