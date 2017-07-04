@@ -27,19 +27,22 @@
                               :pass pass
                               :pass-confirm pass-confirm}))))
 
-(defn mock-create-org [{:keys [id pass pass-confirm]}]
+(defn throw-next [exception]
+  (let [batch-ex (java.sql.BatchUpdateException.)]
+    (.setNextException batch-ex exception)
+    (throw batch-ex)))
+
+(defn mock-create-org [{:keys [id pass]}]
   (cond
     (= id "duplicate")
-    (let [test-ex (java.sql.SQLException. "ERROR: duplicate key value")
-          batch-ex (java.sql.BatchUpdateException.)]
-      (.setNextException batch-ex test-ex)
-      (throw batch-ex))
+    (throw-next (java.sql.SQLException. "ERROR: duplicate key value"))
 
-    (and (= id "foo")
-         (= pass "password1")
-         (= pass-confirm "password1"))
+    (and (= id "foo") (hashers/check "password1" pass))
     {:id "foo"
-     :pass (hashers/encrypt "bar")}))
+     :pass (hashers/encrypt "bar")}
+
+    :else
+    (throw-next (java.sql.SQLClientInfoException. "error"))))
 
 (defn parse-response [body]
   (-> body slurp (parse-string true)))
@@ -58,6 +61,16 @@
     (with-redefs [fcc-tracker.db.core/create-org! mock-create-org]
       (let [{:keys [body status]}
             ((app) (register-request "foo" "password1" "password1"))]
+        (is
+         (= 200 status))
+        (is
+         (= {:result "ok"}
+            (parse-response body))))))
+
+  (testing "registration lowercases username"
+    (with-redefs [fcc-tracker.db.core/create-org! mock-create-org]
+      (let [{:keys [body status]}
+            ((app) (register-request "Foo" "password1" "password1"))]
         (is
          (= 200 status))
         (is
@@ -90,6 +103,15 @@
   (testing "login success"
     (with-redefs [fcc-tracker.db.core/get-org mock-get-org]
       (let [{:keys [body status]} ((app) (login-request "foo" "bar"))]
+        (is
+         (= 200 status))
+        (is
+         (= {:result "ok"}
+            (parse-response body))))))
+
+  (testing "login lowercases username"
+    (with-redefs [fcc-tracker.db.core/get-org mock-get-org]
+      (let [{:keys [body status]} ((app) (login-request "Foo" "bar"))]
         (is
          (= 200 status))
         (is

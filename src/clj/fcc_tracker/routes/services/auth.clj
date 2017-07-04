@@ -1,5 +1,6 @@
 (ns fcc-tracker.routes.services.auth
   (:require [buddy.hashers :as hashers]
+            [clojure.string :as str]
             [fcc-tracker.db.core :as db]
             [fcc-tracker.routes.services.utils :as utils]
             [fcc-tracker.validation :refer [registration-errors]]
@@ -13,6 +14,7 @@
      (db/create-org!
       (-> user
           (dissoc :pass-confirm)
+          (update :id str/lower-case)
           (update :pass hashers/encrypt)))
      (-> {:result :ok}
          (response/ok)
@@ -29,7 +31,7 @@
         (.split ":"))))
 
 (defn- authenticate [[id pass]]
-  (when-let [org (db/get-org {:id id})]
+  (when-let [org (db/get-org {:id (str/lower-case id)})]
     (when (hashers/check pass (:pass org))
       id)))
 

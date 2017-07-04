@@ -33,4 +33,3 @@
     params
     {:fcc_username [st/required]
      :name [st/required]})))
-
