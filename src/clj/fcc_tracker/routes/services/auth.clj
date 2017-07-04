@@ -33,7 +33,7 @@
 (defn- authenticate [[id pass]]
   (when-let [org (db/get-org {:id (str/lower-case id)})]
     (when (hashers/check pass (:pass org))
-      id)))
+      (:id org))))
 
 (defn login! [{:keys [session]} auth]
   (if-let [id (authenticate (decode-auth auth))]
