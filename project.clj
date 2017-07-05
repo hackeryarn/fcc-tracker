@@ -36,7 +36,8 @@
                  [metosin/compojure-api "1.1.10"]
                  [reagent "0.6.2"]
                  [reagent-utils "0.2.1"]
-                 [hickory "0.7.1"]]
+                 [hickory "0.7.1"]
+                 [peridot "0.4.4"]]
 
   :min-lein-version "2.0.0"
 
