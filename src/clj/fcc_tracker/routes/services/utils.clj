@@ -16,4 +16,4 @@
       (log/error e)
       (response/internal-server-error
        {:result :error
-        :message "server error occusered"}))))
+        :message "server error occured"}))))

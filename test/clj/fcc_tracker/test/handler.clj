@@ -18,7 +18,6 @@
       (header "Authorization" (encode-auth id pass))))
 
 (defn mock-get-org [{:keys [id]}]
-  (println "\n Hit this \n")
   (when (= id "foo")
     {:id "foo"
      :pass (hashers/encrypt "bar")}))
@@ -173,6 +172,26 @@
   (when (= org "foo")
     []))
 
+(defn mock-create-member [{:keys [organization name fcc_username]}]
+  (cond
+    (= fcc_username "duplicate")
+    (throw-next (java.sql.SQLException. "ERROR: duplicate key value"))
+
+    (and (= organization "foo")
+         (= name "member")
+         (= fcc_username "username"))
+    {:name "member"
+     :fcc_username "username"}
+
+    :else
+    (throw-next (java.sql.SQLClientInfoException. "error"))))
+
+(defn create-member-req [session name username]
+  (-> session
+      (p/request "/members"
+                 :request-method :post
+                 :body (generate-string {:name name
+                                         :fcc_username username}))))
 
 (deftest test-members
   (with-redefs [db/get-org mock-get-org]
@@ -180,4 +199,21 @@
       (testing "list members"
         (let [{{:keys [body status]} :response} (with-logged-in members-list-req)]
           (is (= 200 status))
-          (is (= [] (parse-response body))))))))
+          (is (= [] (parse-response body))))))
+
+    (with-redefs [db/create-member! mock-create-member]
+      (testing "create member"
+        (let [{{:keys [body status]} :response}
+              (with-logged-in #(create-member-req % "member" "username"))]
+          (is (= 200 status))
+          (is (= {:result "ok"} (parse-response body)))))
+
+      (testing "create member duplicate"
+        (let [{{:keys [body status]} :response}
+              (with-logged-in #(create-member-req % "member" "duplicate"))]
+          (is (= 412 status))
+          (is (= {:result "error"
+                  :message "member with the selected FreeCodeCamp username already exists"}
+                 (parse-response body)))))
+
+      )))
