@@ -216,4 +216,10 @@
                   :message "member with the selected FreeCodeCamp username already exists"}
                  (parse-response body)))))
 
-      )))
+      (testing "create member server error"
+        (let [{{:keys [body status]} :response}
+              (with-logged-in #(create-member-req % "bad" "member"))]
+          (is (= 500 status))
+          (is (= {:result "error"
+                  :message "server error occured"}
+                 (parse-response body))))))))
