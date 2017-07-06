@@ -193,6 +193,15 @@
                  :body (generate-string {:name name
                                          :fcc_username username}))))
 
+(defn mock-delete-member [{:keys [organization fcc_username]}]
+  (when (and (= organization "foo") (= fcc_username "username"))
+    []))
+
+(defn delete-member-req [session username]
+  (-> session
+      (p/request (str "/members/" username)
+                 :request-method :delete)))
+
 (deftest test-members
   (with-redefs [db/get-org mock-get-org]
     (with-redefs [db/list-members mock-list-members]
@@ -201,6 +210,7 @@
           (is (= 200 status))
           (is (= [] (parse-response body))))))
 
+    ;; create member
     (with-redefs [db/create-member! mock-create-member]
       (testing "create member"
         (let [{{:keys [body status]} :response}
@@ -238,4 +248,12 @@
           (is (= 500 status))
           (is (= {:result "error"
                   :message "server error occured"}
-                 (parse-response body))))))))
+                 (parse-response body))))))
+
+    ;; delete member
+    (with-redefs [db/delete-member! mock-delete-member]
+      (testing "delete member"
+        (let [{{:keys [body status]} :response}
+              (with-logged-in #(delete-member-req % "username"))]
+          (is (= 200 status))
+          (is (= {:result "ok"} (parse-response body))))))))
