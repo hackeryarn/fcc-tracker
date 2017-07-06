@@ -24,8 +24,7 @@
    (st/validate
     params
     {:fcc_username [st/required]
-     :name [st/required]
-     :organization [[st/required :message "you must be logged in to create a member"]]})))
+     :name [st/required]})))
 
 (defn new-member-errors [params]
   (first

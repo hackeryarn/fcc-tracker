@@ -208,6 +208,22 @@
           (is (= 200 status))
           (is (= {:result "ok"} (parse-response body)))))
 
+      (testing "create member missing name"
+        (let [{{:keys [body status]} :response}
+              (with-logged-in #(create-member-req % "" "username"))]
+          (is (= 412 status))
+          (is (= {:result "error"
+                  :message {:name "this field is mandatory"}}
+                 (parse-response body)))))
+
+      (testing "create member missing fcc_username"
+        (let [{{:keys [body status]} :response}
+              (with-logged-in #(create-member-req % "member" ""))]
+          (is (= 412 status))
+          (is (= {:result "error"
+                  :message {:fcc_username "this field is mandatory"}}
+                 (parse-response body)))))
+
       (testing "create member duplicate"
         (let [{{:keys [body status]} :response}
               (with-logged-in #(create-member-req % "member" "duplicate"))]
