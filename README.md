@@ -1,6 +1,7 @@
-# freeCodeCamp Tracker
+# freeCodeCamp Tracker DEPRECATED 
 
-[Hosted at freecodecamp-tracker.achernyak.me](http://freecodecamp-tracker.achernyak.me/)
+**FreecodeCamp moved to using React which prevents the application from scraping the web contents.  However, this project still serves as an example of a full stack Clojure project.**
+
 
 I built this tool in order to track the progress of FreeCodeCamp. If you are in an organization
 that is using FreeCodeCamp as supplementary material, and you want a view into everyone's progress.
