@@ -1,6 +1,6 @@
 # freeCodeCamp Tracker DEPRECATED 
 
-**FreecodeCamp moved to using React which prevents the application from scraping the web contents.  However, this project still serves as an example of a full stack Clojure project.**
+**FreecodeCamp moved to using React which prevents this application from scraping the web contents.  However, this project still serves as an example of a full stack Clojure project.**
 
 
 I built this tool in order to track the progress of FreeCodeCamp. If you are in an organization
